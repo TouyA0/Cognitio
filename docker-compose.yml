@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cognitio_db
+    environment:
+      POSTGRES_USER: cognitio_user
+      POSTGRES_PASSWORD: cognitio_password
+      POSTGRES_DB: cognitio_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cognitio_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cognitio_user -d cognitio_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cognitio_backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://cognitio_user:cognitio_password@postgres:5432/cognitio_db
+      JWT_SECRET: your_jwt_secret_key_change_this
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+    networks:
+      - cognitio_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cognitio_frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+    networks:
+      - cognitio_network
+
+volumes:
+  postgres_data:
+
+networks:
+  cognitio_network:
+    driver: bridge
