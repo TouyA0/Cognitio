@@ -1,9 +1,16 @@
+import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { LoginPage } from './pages/LoginPage';
+import { TypeSelectScreen } from './pages/TypeSelectScreen';
 import './styles.css';
+
+type View = 'graph' | 'new' | 'new-form';
+type DiscoveryType = 'reflection' | 'discovery' | 'quote' | 'lecture';
 
 function App() {
   const { user, loading } = useAuth();
+  const [view, setView] = useState<View>('graph');
+  const [selectedType, setSelectedType] = useState<DiscoveryType | null>(null);
 
   if (loading) {
     return (
@@ -23,6 +30,54 @@ function App() {
     return <LoginPage />;
   }
 
+  // New content flow
+  if (view === 'new') {
+    return (
+      <TypeSelectScreen
+        onPick={(type) => {
+          setSelectedType(type);
+          setView('new-form');
+        }}
+        onCancel={() => setView('graph')}
+      />
+    );
+  }
+
+  if (view === 'new-form' && selectedType) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        color: 'var(--ink)',
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36 }}>
+            Nouveau {selectedType}
+          </h1>
+          <p style={{ color: 'var(--ink-3)' }}>Formulaire arrive bientôt 🚀</p>
+          <button
+            onClick={() => setView('graph')}
+            style={{
+              marginTop: 20,
+              padding: '10px 20px',
+              background: 'var(--rubric)',
+              color: 'white',
+              border: 'none',
+              borderRadius: 4,
+              cursor: 'pointer',
+              fontFamily: 'var(--font-serif)',
+            }}
+          >
+            Retour au graphe
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Main graph view
   return (
     <div style={{
       display: 'flex',
@@ -33,7 +88,22 @@ function App() {
     }}>
       <div style={{ textAlign: 'center' }}>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36 }}>Bienvenue, {user.email}</h1>
-        <p style={{ color: 'var(--ink-3)' }}>Le graphe et les formulaires arrivent bientôt 🚀</p>
+        <p style={{ color: 'var(--ink-3)', marginBottom: 24 }}>Le graphe arrive bientôt 🚀</p>
+        <button
+          onClick={() => setView('new')}
+          style={{
+            padding: '12px 24px',
+            background: 'var(--rubric)',
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            fontFamily: 'var(--font-serif)',
+            fontSize: 16,
+          }}
+        >
+          Nouveau contenu
+        </button>
       </div>
     </div>
   );
