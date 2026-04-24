@@ -1,21 +1,42 @@
-import { useEffect, useState } from 'react'
+import { useAuth } from './AuthContext';
+import { LoginPage } from './pages/LoginPage';
+import './styles.css';
 
 function App() {
-  const [status, setStatus] = useState('Connecting...')
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    fetch('http://localhost:3001/api/health')
-      .then(r => r.json())
-      .then(data => setStatus(`✅ ${data.status}`))
-      .catch(() => setStatus('❌ Backend unavailable'))
-  }, [])
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        color: 'var(--ink-3)',
+      }}>
+        <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16 }}>Chargement...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
 
   return (
-    <div style={{ padding: '40px', fontFamily: 'sans-serif' }}>
-      <h1>Cognitio</h1>
-      <p>Backend status: {status}</p>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      color: 'var(--ink)',
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36 }}>Bienvenue, {user.email}</h1>
+        <p style={{ color: 'var(--ink-3)' }}>Le graphe et les formulaires arrivent bientôt 🚀</p>
+      </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
