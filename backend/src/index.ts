@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRouter from './routes/auth.js';
+import discoveriesRouter from './routes/discoveries.js';
+import tagsRouter from './routes/tags.js';
 
 dotenv.config();
 
@@ -23,6 +25,12 @@ app.get('/api', (req, res) => {
 
 // Auth routes
 app.use('/api/auth', authRouter);
+
+// Tags routes
+app.use('/api/tags', tagsRouter);
+
+// Discoveries routes
+app.use('/api/discoveries', discoveriesRouter);
 
 // Error handling
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

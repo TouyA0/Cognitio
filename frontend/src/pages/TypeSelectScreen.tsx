@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TYPE_OPTIONS, TYPE_META } from '../constants';
-import { Icon } from '../icons';
+import { Icon } from '../components/ui/icons';
 
 interface TypeSelectScreenProps {
   onPick: (type: 'reflection' | 'discovery' | 'quote' | 'lecture') => void;

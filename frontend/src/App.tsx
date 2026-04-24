@@ -1,7 +1,11 @@
 import { useState } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { TypeSelectScreen } from './pages/TypeSelectScreen';
+import { ReflectionForm } from './components/forms/ReflectionForm';
+import { DiscoveryForm } from './components/forms/DiscoveryForm';
+import { QuoteForm } from './components/forms/QuoteForm';
+import { LectureForm } from './components/forms/LectureForm';
 import './styles.css';
 
 type View = 'graph' | 'new' | 'new-form';
@@ -44,37 +48,24 @@ function App() {
   }
 
   if (view === 'new-form' && selectedType) {
-    return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        color: 'var(--ink)',
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36 }}>
-            Nouveau {selectedType}
-          </h1>
-          <p style={{ color: 'var(--ink-3)' }}>Formulaire arrive bientôt 🚀</p>
-          <button
-            onClick={() => setView('graph')}
-            style={{
-              marginTop: 20,
-              padding: '10px 20px',
-              background: 'var(--rubric)',
-              color: 'white',
-              border: 'none',
-              borderRadius: 4,
-              cursor: 'pointer',
-              fontFamily: 'var(--font-serif)',
-            }}
-          >
-            Retour au graphe
-          </button>
-        </div>
-      </div>
-    );
+    const handleFormCancel = () => setView('new');
+    const handleFormSave = (data: any) => {
+      console.log('Saving discovery:', data);
+      setView('graph');
+    };
+
+    switch (selectedType) {
+      case 'reflection':
+        return <ReflectionForm onCancel={handleFormCancel} onSave={handleFormSave} />;
+      case 'discovery':
+        return <DiscoveryForm onCancel={handleFormCancel} onSave={handleFormSave} />;
+      case 'quote':
+        return <QuoteForm onCancel={handleFormCancel} onSave={handleFormSave} />;
+      case 'lecture':
+        return <LectureForm onCancel={handleFormCancel} onSave={handleFormSave} />;
+      default:
+        return null;
+    }
   }
 
   // Main graph view
